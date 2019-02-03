@@ -9,12 +9,11 @@
 
 WebServer server(80);
 
-const int led = 13;
+const int led = 23;
+unsigned long ledOffAt = 0;
 
 void handleRoot() {
-  digitalWrite(led, 1);
   server.send(200, "text/plain", "Hello BeamPrint!");
-  digitalWrite(led, 0);
 }
 
 void handleNotFound() {
@@ -66,6 +65,7 @@ void setup(void) {
   server.on("/alarm", []() {
     server.send(200, "text/plain", "Activating alarm!!!");
     Serial.println("Activating alarm!!!");
+    ledOffAt = millis() + 3000;
   });
 
   server.onNotFound(handleNotFound);
@@ -76,4 +76,9 @@ void setup(void) {
 
 void loop(void) {
   server.handleClient();
+  if(millis() >= ledOffAt) {
+    digitalWrite(led,0);
+  } else {
+    digitalWrite(led,1);
+  }
 }
